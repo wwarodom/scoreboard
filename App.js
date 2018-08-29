@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, YellowBox, Picker, Modal, TouchableHighlight} from 'react-native';
 import axios from 'axios';
-import { Container, Header, Content, Card, CardItem, Icon,
+import { Container, Header, Content, Card, CardItem, Icon, DeckSwiper, Left, Image,
       Body, Title, View , Thumbnail, Text, Button, Badge} from 'native-base';      
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import NumericInput from './components/NumericInput';
@@ -10,6 +10,19 @@ import CountDown from './components/CountDown';
 
 YellowBox.ignoreWarnings(["Warning:"]);
 const timeMatch = 1200
+
+const cards = [
+  {
+    text: 'ครึ่งแรก',
+    teamA: 0,
+    teamB: 0,
+  },  
+  {
+    text: 'ครึ่งหลัง',
+    teamA: 0,
+    teamB: 0,
+  },
+]; 
 
 export default class App extends Component  {
 
@@ -20,6 +33,8 @@ export default class App extends Component  {
                    isRestart: false,
                    ip: '172.26.1.168',
                    modalVisible: false,
+                   newTime: timeMatch,
+                   isBackward: true,
               };
   } 
  
@@ -88,8 +103,9 @@ export default class App extends Component  {
               <Title >Scoreboard</Title>
           </Body>
       </Header>
-      <Content padder>
-  
+ 
+      <Content padder>  
+
           <Modal
             animationType="slide"
             transparent={false}
@@ -98,76 +114,87 @@ export default class App extends Component  {
               this.setModalVisible(!this.state.modalVisible)
             }}>
  
-               <Card>
-                <CardItem header>
-                  <Text>เลือกโหมดการตั้งเวลา</Text>
-                </CardItem>
-                <CardItem>
-                  <Body>              
-                   <Button rounded large warning 
-                   style={{marginBottom: 20, alignSelf:'center' }}
-                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                    }} >
-                      <Text>12 นาที</Text>
-                   </Button>
-
-                   <Button rounded large warning
-                   style={{marginBottom: 20, alignSelf:'center' }}
-                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                    }} >
-                      <Text>20 นาที</Text>
-                   </Button>
-                   <Button rounded large warning 
-                   style={{marginBottom: 20, alignSelf:'center' }}
-                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                    }} >
-                      <Text>30 นาที</Text>
-                   </Button>                  
-
-                  </Body>
-                </CardItem>
-                   <Button rounded large warning 
-                   style={{marginBottom: 20, alignSelf:'center' }}
-                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                    }} >
-                      <Text>นับไปหน้า</Text>
-                   </Button>  
-                                      <Button rounded large warning 
-                   style={{marginBottom: 20, alignSelf:'center' }}
-                   onPress={() => {
-                    this.setModalVisible(!this.state.modalVisible);
-                    }} >
-                      <Text>นับถอยหลัง</Text>
-                   </Button>  
-                <CardItem>
-                  <Body>
-                    
-                  </Body>
+              <Card > 
+                <CardItem header bordered 
+                    style={{paddingTop: 0, paddingBottom: 0,  marginBottom: 10, 
+                          justifyContent: 'center'}}>             
+                    <Text style={{ fontSize:25}}>เลือกโหมดการตั้งเวลา</Text>         
                 </CardItem>
 
-                <CardItem footer>
-                  <Button iconLeft
-                    style={{marginBottom: 20, alignSelf:'center' }}
+                <CardItem  style={{paddingTop: 0,
+                                    paddingBottom: 0,justifyContent: 'center'}} > 
+                    <Grid>
+                      <Col>
+                        <Text style={{fontSize: 20, alignSelf:'center', marginBottom: 10}}>เวลา</Text>
+                        <Button bordered warning style={{alignSelf:'center', marginBottom: 10}}>
+                          <Text style={{fontSize: 20}}> {parseInt(this.state.newTime)/60 } นาที</Text>
+                        </Button>
+                      </Col>
+                      <Col>
+                        <Text style={{fontSize: 20, alignSelf:'center', marginBottom: 10}}>การจับเวลา</Text>
+                        <Button bordered info style={{alignSelf:'center', marginBottom: 10}}>                      
+                          <Text style={{fontSize: 20}}> 
+                              {(this.state.isBackward)? 'นับถอยหลัง':'นับไปข้างหน้า'}</Text>
+                        </Button>
+                      </Col>
+                      </Grid> 
+                  </CardItem> 
+  
+                <CardItem>  
+                  <Grid>
+                    <Col>    
+                       <Button rounded  warning 
+                       style={{marginBottom: 20, alignSelf:'center' }}
+                       onPress={() => { this.setState({newTime:720}) }} >
+                          <Text>12 นาที</Text>
+                       </Button> 
+                       <Button rounded  warning
+                       style={{marginBottom: 20, alignSelf:'center' }}
+                       onPress={() => { this.setState({newTime:1200}) }} >
+                          <Text>20 นาที</Text>
+                       </Button> 
+                       <Button rounded  warning 
+                       style={{marginBottom: 20, alignSelf:'center' }}
+                       onPress={() => { this.setState({newTime:1800}) }}  >
+                          <Text>30 นาที</Text>
+                       </Button>      
+                     </Col>
+
+                     <Col>                 
+                        <Button rounded  info 
+                         style={{marginBottom: 20, alignSelf:'center' }}
+                         onPress={() => {
+                            this.setState({isBackward:false})
+                          }} >
+                            <Text>นับไปหน้า</Text>
+                         </Button>   
+                         <Button rounded  info 
+                         style={{ alignSelf:'center' }}
+                         onPress={() => {
+                           this.setState({isBackward:true})
+                          }} >
+                            <Text>นับถอยหลัง</Text>
+                         </Button>   
+                        </Col>
+                    </Grid>  
+                </CardItem>
+ 
+
+                <CardItem footer style={{ alignSelf:'center' }} >
+                  <Button iconLeft      
+                    style={{marginBottom: 10}}              
                     onPress={() => {
                      this.setModalVisible(!this.state.modalVisible);
                      }} 
                     >
                     <Icon name='home' />
-                    <Text>ยกเลิก</Text>
+                    <Text>ตกลง</Text>
                   </Button>
                 </CardItem>
              </Card>
- 
-          
- 
-       
+  
           </Modal>
-
-     
+  
         <Card>
           <CardItem header bordered style={{paddingTop: 0, paddingBottom: 0,justifyContent: 'center'}}>             
               <Text style={{ fontSize:25}}>เวลา</Text>         
@@ -188,47 +215,54 @@ export default class App extends Component  {
           </CardItem>
         </Card>
 
+        <View style={{minHeight: 150}} >
+        <DeckSwiper
+          dataSource={cards}
+          renderItem={item =>
+              <Card style={{ elevation: 2 }}> 
+                <CardItem header bordered 
+                    style={{paddingTop: 0, paddingBottom: 0, 
+                          justifyContent: 'center'}}>             
+                    <Text style={{ fontSize:25}}> { item.text} </Text>         
+                </CardItem>
 
+                <CardItem bordered>
+                  <Body> 
+                    <Grid> 
+                        <Col>
+                            <Text style={{fontSize:25, marginBottom: 0, textAlign:'center' }}>TeamA</Text>
+                            <View style={{borderWidth: 1, alignItems : 'center',justifyContent: 'center', alignSelf:'center' }}/>
+                              <NumericInput 
+                                
+                                minValue={0} 
+                                rounded 
+                                textColor='#B0228C'
+                                iconStyle={{ color: 'white' }} 
+                                rightButtonBackgroundColor='#EA3788' 
+                                leftButtonBackgroundColor='#E56B70'
+                                onChange={value => console.log(value)}  />            
+                            </View>
+                        </Col>
+                        <Col>
+                            <Text style={{fontSize:25, marginBottom: 0, textAlign:'center' }}>TeamB</Text>
+                            <NumericInput 
+                              style={{alignItems : 'center' ,justifyContent: 'center'}}
+                              minValue={0} 
+                              rounded 
+                              textColor='#B0228C'
+                              iconStyle={{ color: 'white' }} 
+                              rightButtonBackgroundColor='#0000FF' 
+                              leftButtonBackgroundColor='#4060FF'
+                              onChange={value => console.log(value)}  />   
+                        </Col>
+                    </Grid> 
 
-        <Card> 
-          <CardItem bordered>
-            <Body> 
-                <Button rounded large style={{alignSelf:'center' }}>
-                  <Text style={{marginBottom: 0, textAlign:'center' }}>ครึ่งแรก</Text>         
-                </Button>  
-              <Grid> 
-                  <Col><Text style={{fontSize:25, marginBottom: 0, textAlign:'center' }}>TeamA</Text>         
-                  </Col>
-                  <Col><Text style={{fontSize:25, marginBottom: 0, textAlign:'center' }}>TeamB</Text></Col>
-              </Grid> 
-              <Grid   style={{alignItems : 'center',justifyContent: 'center'}}> 
-                  <Col  style={{alignItems : 'center',justifyContent: 'center', marginRight: 40 }}>
-                    <NumericInput 
-                        style={{alignItems : 'center',justifyContent: 'center',  }}
-                        minValue={0} 
-                        rounded 
-                        textColor='#B0228C'
-                        iconStyle={{ color: 'white' }} 
-                        rightButtonBackgroundColor='#EA3788' 
-                        leftButtonBackgroundColor='#E56B70'
-                        onChange={value => console.log(value)}  />               
-                  </Col>
-                  <Col>
-                    <NumericInput 
-                        style={{alignItems : 'center' ,justifyContent: 'center'}}
-                        minValue={0} 
-                        rounded 
-                        textColor='#B0228C'
-                        iconStyle={{ color: 'white' }} 
-                       rightButtonBackgroundColor='#0000FF' 
-                        leftButtonBackgroundColor='#4060FF'
-                        onChange={value => console.log(value)}  />   
-                  </Col>
-              </Grid>
-            </Body>
-          </CardItem>
-        </Card>   
-
+                  </Body>
+                </CardItem>
+              </Card>   
+            }
+          /> 
+        </View>
 
        <Card> 
          <CardItem bordered >
